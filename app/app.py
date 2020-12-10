@@ -22,7 +22,6 @@ def index():
     cursor = mysql.get_db().cursor()
     cursor.execute('SELECT * FROM tblsnldImport')
     result = cursor.fetchall()
-    print(result[0])
     return render_template('index.html', title='Home', user=user, results=result)
 
 
@@ -31,7 +30,6 @@ def record_view(res_GameNumber):
     cursor = mysql.get_db().cursor()
     cursor.execute('SELECT * FROM tblsnldImport WHERE GameNumber=%s', res_GameNumber)
     result = cursor.fetchall()
-    print(result[0])
     return render_template('view.html', title='View Form', res=result[0])
 
 
@@ -96,15 +94,26 @@ def api_retrieve(res_GameNumber) -> str:
     resp = Response(json_result, status=200, mimetype='application/json')
     return resp
 
-
-@app.route('/api/v1/results/', methods=['POST'])
-def api_add() -> str:
-    resp = Response(status=201, mimetype='application/json')
+@app.route('/api/v1/results/<int:res_GameNumber>', methods=['PUT'])
+def api_edit(res_GameNumber) -> str:
+    cursor = mysql.get_db().cursor()
+    content = request.json
+    inputData = (content['GameNumber'], content['GameLength'], res_GameNumber)
+    sql_update_query = """UPDATE tblsnldImport t SET t.GameNumber = %s, t.GameLength = %s, WHERE t.GameNumber = %s """
+    cursor.execute(sql_update_query, inputData)
+    mysql.get_db().commit()
+    resp = Response(status=200, mimetype='application/json')
     return resp
 
 
-@app.route('/api/v1/results/<int:res_GameNumber>', methods=['PUT'])
-def api_edit(res_GameNumber) -> str:
+@app.route('/api/v1/results/', methods=['POST'])
+def api_add() -> str:
+    content = request.json
+    cursor = mysql.get_db().cursor()
+    inputData = (content['GameNumber'], content['GameLength'])
+    sql_insert_query = """INSERT INTO tblsnldImport (GameNumber, GameLength) VALUES (%s, %s) """
+    cursor.execute(sql_insert_query, inputData)
+    mysql.get_db().commit()
     resp = Response(status=201, mimetype='application/json')
     return resp
 
