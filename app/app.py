@@ -88,22 +88,24 @@ def api_browse() -> str:
 @app.route('/api/v1/results/<int:res_GameNumber>', methods=['GET'])
 def api_retrieve(res_GameNumber) -> str:
     cursor = mysql.get_db().cursor()
-    cursor.execute('SELECT * FROM tblsnldImport WHERE GameNumber=%s',res_GameNumber)
+    cursor.execute('SELECT * FROM tblsnldImport WHERE GameNumber=%s', res_GameNumber)
     result = cursor.fetchall()
     json_result = json.dumps(result)
     resp = Response(json_result, status=200, mimetype='application/json')
     return resp
 
-@app.route('/api/v1/cities/<int:res_GameNumber>', methods=['PUT'])
+
+@app.route('/api/v1/results/<int:res_GameNumber>', methods=['PUT'])
 def api_edit(res_GameNumber) -> str:
     cursor = mysql.get_db().cursor()
     content = request.json
-    inputData = (content['GameNumber'], content['GameLength'],res_GameNumber)
-    sql_update_query = """UPDATE tblsnldImport t SET t.GameNumber = %s, t.GameLength = %s WHERE t.GameNumber = %s """
+    inputData = (content['GameNumber'], content['GameLength'], res_GameNumber)
+    sql_update_query = """ UPDATE tblsnldImport t SET t.GameNumber = %s, t.GameLength = %s WHERE t.GameNumber = %s """
     cursor.execute(sql_update_query, inputData)
     mysql.get_db().commit()
     resp = Response(status=200, mimetype='application/json')
     return resp
+
 
 @app.route('/api/v1/results/', methods=['POST'])
 def api_add() -> str:
@@ -121,7 +123,7 @@ def api_add() -> str:
 def api_delete(res_GameNumber) -> str:
     cursor = mysql.get_db().cursor()
     sql_delete_query = """DELETE FROM tblsnldImport WHERE GameNumber = %s """
-    cursor.execute(sql_delete_query,res_GameNumber)
+    cursor.execute(sql_delete_query, res_GameNumber)
     mysql.get_db().commit()
     resp = Response(status=200, mimetype='application/json')
     return resp
