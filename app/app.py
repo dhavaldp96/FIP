@@ -111,7 +111,7 @@ def api_add() -> str:
     content = request.json
     cursor = mysql.get_db().cursor()
     inputData = (content['GameNumber'], content['GameLength'])
-    sql_insert_query = """INSERT INTO tblsnldImport (GameNumber, GameLength) VALUES (%s, %s) """
+    sql_insert_query = """INSERT INTO tblsnldImport (GameNumber,GameLength) VALUES (%s,%s) """
     cursor.execute(sql_insert_query, inputData)
     mysql.get_db().commit()
     resp = Response(status=201, mimetype='application/json')
